@@ -19,7 +19,9 @@ const tileColor = {
     '2048': 'rgb(64, 204, 82)',
 
 }
-
+function log(base, x) {
+    return Math.log(x) / Math.log(base)
+}
 function transpose(mat) {
     var new_mat = []
     for (var i = 0; i < 4; i++) {
@@ -53,13 +55,13 @@ function isFull(mat) {
 class Player {
     constructor() {
         this.name
-        this.score
+        this.score = 0
     }
 }
 class Match {
     constructor() {
-        this.players
-        this.currPlayer
+        this.players = []
+        this.currPlayer = 0
         this.board
         this.winner
     }
@@ -101,10 +103,10 @@ class Match {
     mergeTiles() { // merge after compress
         for (var i = 0; i < 4; i++) {
             for (var j = 0; j < 3; j++) {
-                if (this.board[i][j] == this.board[i][j + 1]) {
+                if (this.board[i][j] == this.board[i][j + 1] && this.board[i][j] != 0) {
+                    this.players[this.currPlayer].score += log(2,this.board[i][j])
                     this.board[i][j] *= 2
                     this.board[i][j + 1] = 0
-                    // score calculation here
                 }
             }
         }
@@ -153,26 +155,31 @@ class Match {
                 }
             }
         }
-        console.log(this.getGameState())
     }
     addHandleInput() {
         window.addEventListener('keydown', (e) => {
-            this.updateBoard(e.key)
-            var state = this.getGameState()
-            if (state == 'WON') {
-                // win display
-                this.showResult(state)
+            if (e.key == 'w' || e.key == 'a' || e.key == 's' || e.key == 'd') {
+                this.updateBoard(e.key)
+                var state = this.getGameState()
+                if (state == 'WON') {
+                    // win display
+                    this.showResult(state)
+                }
+                else if (state == 'GAME NOT OVER') {
+                    if (!isFull(this.board))
+                        this.addNewTile()
+                    else
+                        this.showResult('LOST')
+                }
+                else {
+                    // lose display
+                    this.showResult(state)
+                }
+                var scoreElement = document.querySelector(`#player${this.currPlayer+1}-score`)
+                scoreElement.innerHTML = String(this.players[this.currPlayer].score)
+                this.currPlayer = (this.currPlayer+1)%this.players.length
             }
-            else if (state == 'GAME NOT OVER') {
-                if (!isFull(this.board))
-                    this.addNewTile()
-            }
-            else {
-                // lose display
-                this.showResult(state)
-            }
-        }
-        )
+        })
     }
     clearBoard() {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -238,10 +245,29 @@ class Match {
     }
 }
 
+var player1 = new Player
+player1.name = prompt('Player 1\'s name:')
+var player2 = new Player
+player2.name = prompt('Player 2\'s name:')
+
+var playerContainer = document.getElementById('player-container')
+
+var player1Div = document.createElement('div')
+player1Div.setAttribute('id','player1')
+player1Div.setAttribute('class','players')
+player1Div.innerHTML = `<p>Name: <span>${player1.name}</span></p><p>Score: <span id="player1-score">${player1.score}</span></p>`
+
+var player2Div = document.createElement('div')
+player2Div.setAttribute('id','player2')
+player2Div.setAttribute('class','players')
+player2Div.innerHTML = `<p>Name: <span>${player2.name}</span></p><p>Score: <span id="player2-score">${player2.score}</span></p>`
+
+playerContainer.appendChild(player1Div)
+playerContainer.appendChild(player2Div)
+
 var match = new Match
+match.players.push(player1,player2)
+
 match.initBoard()
 match.addHandleInput()
 match.animate()
-
-
-
