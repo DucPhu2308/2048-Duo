@@ -250,20 +250,17 @@ player1.name = prompt('Player 1\'s name:')
 var player2 = new Player
 player2.name = prompt('Player 2\'s name:')
 
-var playerContainer = document.getElementById('player-container')
+function addPlayerDOM(player, playerIndex) {
+    var playerContainer = document.getElementById('player-container')
+    var player1Div = document.createElement('div')
+    player1Div.setAttribute('id',`player${playerIndex}`)
+    player1Div.setAttribute('class','player')
+    player1Div.innerHTML = `<p>Name: <span>${player.name}</span></p><p>Score: <span id="player${playerIndex}-score">${player.score}</span></p>`
+    playerContainer.appendChild(player1Div)
+}
 
-var player1Div = document.createElement('div')
-player1Div.setAttribute('id','player1')
-player1Div.setAttribute('class','players')
-player1Div.innerHTML = `<p>Name: <span>${player1.name}</span></p><p>Score: <span id="player1-score">${player1.score}</span></p>`
-
-var player2Div = document.createElement('div')
-player2Div.setAttribute('id','player2')
-player2Div.setAttribute('class','players')
-player2Div.innerHTML = `<p>Name: <span>${player2.name}</span></p><p>Score: <span id="player2-score">${player2.score}</span></p>`
-
-playerContainer.appendChild(player1Div)
-playerContainer.appendChild(player2Div)
+addPlayerDOM(player1,1)
+addPlayerDOM(player2,2)
 
 var match = new Match
 match.players.push(player1,player2)

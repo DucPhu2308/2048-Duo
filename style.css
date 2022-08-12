@@ -13,7 +13,7 @@ body {
 #game {
     position: absolute;
     left: 50%;
-    top: 50%;
+    top: 36%;
     transform: translate(-50%, -50%);
 }
 
@@ -30,4 +30,26 @@ body {
     font: Arial;
     font-size: 50px;
     background-color: #ccc;
+}
+
+#player-container {
+    margin: 20px;
+    width: 24%;
+    border: 5px solid rgb(163, 139, 52);
+    background-color: rgb(231, 231, 84);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    padding: 10px;
+}
+.player {
+    border: 3px solid #ccc;
+    border-radius: 20px;
+    background-color: antiquewhite;
+    box-shadow: -5px 5px 5px 5px;
+    color: rgb(163, 139, 52);
+    padding: 10px;
+    margin: 20px;
+}
+.player span {
+    color: chocolate;
 }
