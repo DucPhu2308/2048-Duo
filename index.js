@@ -1,9 +1,24 @@
 var resultBox = document.getElementById('resultBox')
 const canvas = document.querySelector('#game')
 const ctx = canvas.getContext('2d')
-canvas.width = 1024
-canvas.height = 678
+canvas.width = 500
+canvas.height = 500
 canvas.style.border = "2px solid"
+
+const tileColor = {
+    '2': 'red',
+    '4': 'rgb(252, 104, 0)',
+    '8': 'rgb(252, 150, 9)',
+    '16': 'rgb(252, 239, 9)',
+    '32': 'rgb(252, 254, 143)',
+    '64': 'rgb(252, 178, 233)',
+    '128': 'rgb(172, 178, 233)',
+    '256': 'rgb(29, 178, 233)',
+    '512': 'rgb(29, 79, 233)',
+    '1024': 'rgb(143, 16, 138)',
+    '2048': 'rgb(64, 204, 82)',
+
+}
 
 function transpose(mat) {
     var new_mat = []
@@ -26,15 +41,11 @@ function reverse(mat) {
     }
     return new_mat
 }
-class UI {
-    static showResult(state) {
-        if (state === 'WON') {
-            resultBox.innerHTML = 'YOU WON!'
-            resultBox.didplay = 'block'
-        } else if (state === 'GAME OVER') {
-            resultBox.innerHTML = 'YOU LOSE!'
-            resultBox.didplay = 'block'
-        }
+
+function showResult(state) {
+    if (state === 'WON' || 'LOST') {
+        resultBox.innerHTML = 'YOU ' + state + '!!!'
+        resultBox.didplay = 'block'
     }
 }
 class Player {
@@ -68,6 +79,7 @@ class Match {
             y = Math.floor(Math.random()*4)
         }
         this.board[x][y] = 2
+        console.log('finding')
     }
     compressBoard() { // pull tiles to the left
         var new_board = []
@@ -120,33 +132,42 @@ class Match {
         let padding = 5
         let tileSize = (canvas.width - padding * 5) / 4
 
-        ctx.save()
-        ctx.strokeStyle = '#aaa'
-        ctx.fillStyle = '#ccc'
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 4; j++) {
-                let x = i * (tileSize + padding) + padding
-                let y = j * (tileSize + padding) + padding
-                ctx.strokeRect(x, y, tileSize, tileSize)
-                ctx.fillRect(x, y, tileSize, tileSize)
-                ctx.font = '30px Arial'
-                ctx.fillText(`${this.board[i][j]}`, x, y);
+                if (this.board[i][j] !== 0) {
+                    let x = i * (tileSize + padding) + padding
+                    let y = j * (tileSize + padding) + padding
+
+                    ctx.save()
+                    ctx.strokeStyle = '#000'
+                    ctx.fillStyle = tileColor[`${this.board[i][j]}`]
+                    ctx.strokeRect(x, y, tileSize, tileSize)
+                    ctx.fillRect(x, y, tileSize, tileSize)
+
+                    ctx.fillStyle = '#fff'
+                    ctx.font = '50px Arial'
+                    ctx.textAlign = 'center'
+                    ctx.fillText(`${this.board[i][j]}`, x + tileSize / 2, y + tileSize * (3/5));
+                    ctx.restore()
+                }
             }
         }
-        ctx.restore()
+        console.log(this.getGameState())
     }
     addHandleInput() {
-        canvas.addEventListener('keydown',(e) => {
+        window.addEventListener('keydown',(e) => {
                 this.updateBoard(e.key)
                 var state = this.getGameState()
                 if (state == 'WON') {
                     // win display
+                    showResult(state)
                 }
                 else if (state == 'GAME NOT OVER') {
                     this.addNewTile()
                 }
                 else {
                     // lose display
+                    showResult(state)
                 }
             }
         )
